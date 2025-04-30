@@ -94,11 +94,11 @@ class Trials:
     def __init__(
         self,
         checkpoint: Checkpoint,
-        epoch_fn: Callable[[Experiment], Any],
+        exp_fn: Callable[[Experiment], Any],
         key_gen: Callable[[Experiment], str],
     ) -> None:
         self._checkpoint: Checkpoint = checkpoint
-        self._epoch_fn: Callable[[Experiment], Any] = epoch_fn
+        self._epoch_fn: Callable[[Experiment], Any] = exp_fn
         self._key_gen: Callable[[Experiment], str] = key_gen
 
     @property
