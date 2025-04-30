@@ -67,3 +67,10 @@ extra-dependencies = [
 
 [tool.hatch.envs.types.scripts]
 check = "mypy --install-types --non-interactive {args:trialist tests}"
+
+
+[tool.hatch.build.targets.sdist]
+packages = ["trialist"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["trialist"]
