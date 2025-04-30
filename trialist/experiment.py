@@ -128,7 +128,7 @@ class Trials:
         max_count: int = prod(counts)
 
         # Make a range(1…count) for each entry
-        ranges: list[range] = [range(1, c + 1) for c in counts]
+        ranges: list[range] = [range(0, c) for c in counts]
 
         # product(*) will iterate over every possible combination
         # combo is a tuple that contains a configuration of the counts_matrix
