@@ -20,9 +20,9 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-Documentation = "https://github.com/Yiannis128/trialist#readme"
-Issues = "https://github.com/Yiannis128/trialist/issues"
-Source = "https://github.com/Yiannis128/trialist"
+Documentation = "https://github.com/Yiannis128/trialist-python#readme"
+Issues = "https://github.com/Yiannis128/trialist-python/issues"
+Source = "https://github.com/Yiannis128/trialist-python"
 
 [build-system]
 requires = ["hatchling"]

@@ -1,0 +1,43 @@
+name: Build, Test, and Upload Artifact
+
+on: push
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Hatch
+        run: pipx install hatch
+
+      - name: Configure Hatch (Optional)
+        run: |
+          hatch config set --user projects.test.env-vars.COVERAGE_FILE ".coverage.${{ matrix.python-version }}"
+          hatch config set --user matrix.env.PYTHON ${{ matrix.python-version }}
+
+      - name: Build with Hatch
+        run: hatch build
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.python-version }}
+          path: dist/
+          if-no-files: error # Ensure the action fails if no files are found
+
+      - name: Test with Hatch
+        run: hatch test
+        env: # Define environment variable
+          PYTHON: ${{ matrix.python-version }}

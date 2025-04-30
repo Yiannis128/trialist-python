@@ -26,7 +26,7 @@ experimental results are loaded without checks.
 
 ### Example
 
-See the [demo](demo.ipynb) file.
+See the [demo](https://github.com/Yiannis128/trialist-python/blob/master/demo.ipynb) file.
 
 ## Installation
 
@@ -36,4 +36,4 @@ pip install trialist
 
 ## License
 
-See the LICENSE file.
+See the [LICENSE](https://github.com/Yiannis128/trialist-python/blob/master/LICENSE) file.
