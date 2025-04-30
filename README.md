@@ -2,6 +2,7 @@
 
 [![PyPI - Version](https://img.shields.io/pypi/v/trialist.svg)](https://pypi.org/project/trialist)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/trialist.svg)](https://pypi.org/project/trialist)
+[![Build, Test, and Upload Artifact](https://github.com/Yiannis128/trialist-python/actions/workflows/workflow.yaml/badge.svg?branch=master)](https://github.com/Yiannis128/trialist-python/actions/workflows/workflow.yaml)
 
 -----
 
