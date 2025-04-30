@@ -50,9 +50,15 @@ exclude_lines = [
 [tool.hatch.version]
 path = "trialist/__about__.py"
 
+[tool.hatch.envs.default]
+dependencies = [
+  "pytest",
+  "ipykernel",
+]
+
 [tool.hatch.envs.hatch-test]
 description = "Used when running pytest. Using hatch test..."
-extra-dependencies = ["pytest", "pytest-subtests"]
+extra-dependencies = ["pytest-subtests"]
 
 [tool.hatch.envs.types]
 extra-dependencies = [
