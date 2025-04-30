@@ -1,10 +1,8 @@
 # Author: Yiannis Charalambous
 
-from pathlib import Path
 import joblib
-import pytest
 
-from trialist import Experiment, Checkpoint, Trials
+from trialist import Checkpoint, Trials
 
 
 def test_run_and_cache_behavior(temp_checkpoint_dir, mock_epoch_fn, key_gen):

@@ -1,7 +1,5 @@
 # Author: Yiannis Charalambous
 
-
-from pathlib import Path
 import pytest
 import joblib
 from loguru import logger
