@@ -16,7 +16,10 @@ classifiers = [
 dependencies = [
   "joblib",
   "loguru",
+  "ipykernel",
+  "ipywidgets",
 ]
+
 dynamic = ["version"]
 
 [project.urls]
@@ -74,3 +77,4 @@ packages = ["trialist"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["trialist"]
+

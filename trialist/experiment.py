@@ -7,6 +7,8 @@ from itertools import product
 import joblib
 from loguru import logger
 
+from trialist.trial_viewer import TrialViewer
+
 
 class Experiment(NamedTuple):
     """Represents a single experiment.
@@ -96,10 +98,12 @@ class Trials:
         checkpoint: Checkpoint,
         exp_fn: Callable[[Experiment], Any],
         key_gen: Callable[[Experiment], str],
+        viewer: TrialViewer | None = None,
     ) -> None:
         self._checkpoint: Checkpoint = checkpoint
         self._epoch_fn: Callable[[Experiment], Any] = exp_fn
         self._key_gen: Callable[[Experiment], str] = key_gen
+        self._viewer: TrialViewer | None = viewer
 
     @property
     def checkpoint_names(self) -> list[str]:
@@ -137,11 +141,14 @@ class Trials:
         self, counts_fn: Callable[[int], Experiment | None]
     ) -> Iterator[ExperimentResult]:
         """Runs experiments generated dynamically until counts_fn returns None."""
+        self._init_display(1)
         idx = 0
         while True:
             exp: Experiment | None = counts_fn(idx)
             if exp is None:
                 break
+
+            self._update_display(exp.idx, exp.max_count)
 
             key: str = self._key_gen(exp)
             # Check for existing checkpoint
@@ -169,6 +176,8 @@ class Trials:
         # Make a range(1…count) for each entry
         ranges: list[range] = [range(c) for c in counts]
 
+        self._init_display(max_count)
+
         # product(*) will iterate over every possible combination
         # combo is a tuple that contains a configuration of the counts_matrix
         for exp_idx, combo in enumerate(product(*ranges)):
@@ -178,6 +187,9 @@ class Trials:
                 idx=exp_idx,
                 max_count=max_count,
             )
+
+            self._update_display(exp_idx)
+
             key: str = self._key_gen(exp)
             # Checkpoint Check
             result: Any = self._checkpoint.check(key)
@@ -187,3 +199,16 @@ class Trials:
                 self._checkpoint.save(key, result)
 
             yield ExperimentResult(experiment=exp, result=result)
+
+    def _init_display(self, max_count: int) -> None:
+        # Display
+        if self._viewer:
+            self._viewer.max_count = max_count
+            self._viewer.display()
+
+    def _update_display(self, progress: int, max_count: int | None = None) -> None:
+        # Display
+        if self._viewer:
+            self._viewer.progress = progress
+            if max_count:
+                self._viewer.max_count = max_count
