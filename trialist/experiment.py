@@ -90,7 +90,7 @@ class Checkpoint:
             self._logger.info(f"Checkpoint discarded: {checkpoint_file}")
 
 
-class Trials:
+class Trial:
     """Class for running experiments in a loop."""
 
     def __init__(

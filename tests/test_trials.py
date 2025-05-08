@@ -2,7 +2,7 @@
 
 import joblib
 
-from trialist import Checkpoint, Trials
+from trialist import Checkpoint, Trial
 from trialist.experiment import Experiment, ExperimentResult
 
 
@@ -12,7 +12,7 @@ def test_run_and_cache_behavior(temp_checkpoint_dir, mock_epoch_fn, key_gen):
     second run should load from cache.
     """
     checkpoint = Checkpoint(temp_checkpoint_dir)
-    trials = Trials(checkpoint, mock_epoch_fn, key_gen)
+    trials = Trial(checkpoint, mock_epoch_fn, key_gen)
 
     # First run: creates two checkpoints
     first = trials.run([("param", 2)])
@@ -42,7 +42,7 @@ def test_checkpoint_names_and_clear(temp_checkpoint_dir, mock_epoch_fn, key_gen)
     clear_checkpoints should remove them all.
     """
     checkpoint = Checkpoint(temp_checkpoint_dir)
-    trials = Trials(checkpoint, mock_epoch_fn, key_gen)
+    trials = Trial(checkpoint, mock_epoch_fn, key_gen)
 
     trials.run([("a", 2), ("b", 1)])
     names = sorted(trials.checkpoint_names)
@@ -70,7 +70,7 @@ def test_run_dynamic_behavior(temp_checkpoint_dir, key_gen):
         return Experiment(params={"x": index}, idx=index, max_count=3)
 
     checkpoint = Checkpoint(temp_checkpoint_dir)
-    trials = Trials(checkpoint, mock_epoch_fn, key_gen)
+    trials = Trial(checkpoint, mock_epoch_fn, key_gen)
 
     results = trials.run_dynamic(counts_fn)
 
