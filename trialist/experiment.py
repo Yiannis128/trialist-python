@@ -43,7 +43,7 @@ class Checkpoint:
         validate_fn: Callable[[Any], bool] = lambda *_: True,
         logger2: Any = None,
     ) -> None:
-        self._checkpoint_dir: Path = checkpoint_dir
+        self._checkpoint_dir: Path = checkpoint_dir.absolute()
         self._clear_names: bool = clear_names
         self._logger = logger2 if logger2 else logger.bind(module="Trialist")
         self._delete_invalid: bool = delete_invalid
