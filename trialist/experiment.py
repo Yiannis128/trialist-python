@@ -108,6 +108,30 @@ class Trials:
             f.name for f in self._checkpoint.checkpoint_dir.iterdir() if f.is_file()
         ]
 
+    def run_dynamic(
+        self, counts_fn: Callable[[int], Experiment | None]
+    ) -> list[ExperimentResult]:
+        """Runs experiments generated dynamically until counts_fn returns None."""
+        results: list[ExperimentResult] = []
+        idx = 0
+        while True:
+            exp: Experiment | None = counts_fn(idx)
+            if exp is None:
+                break
+
+            key: str = self._key_gen(exp)
+            # Check for existing checkpoint
+            cached: Any = self._checkpoint.check(key)
+            if cached is None:
+                # Execute experiment and save
+                outcome = self._epoch_fn(exp)
+                self._checkpoint.save(key, outcome)
+            else:
+                outcome = cached
+            results.append(ExperimentResult(experiment=exp, result=outcome))
+            idx += 1
+        return results
+
     def run(
         self,
         counts_matrix: list[tuple[str, int]],
@@ -149,12 +173,7 @@ class Trials:
                 self._checkpoint.save(key, result)
 
             # Store experiment
-            results.append(
-                ExperimentResult(
-                    result=result,
-                    experiment=exp,
-                )
-            )
+            results.append(ExperimentResult(result=result, experiment=exp))
         return results
 
     def clear_checkpoints(self) -> None:

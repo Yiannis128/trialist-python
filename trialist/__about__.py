@@ -1,4 +1,4 @@
 # SPDX-FileCopyrightText: 2025-present Yiannis Charalambous <yiannis128@hotmail.com>
 #
 # SPDX-License-Identifier: GPLv3
-__version__ = "0.0.1.post0"
+__version__ = "0.1.0"
