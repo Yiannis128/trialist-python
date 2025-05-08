@@ -1,7 +1,7 @@
 # Author: Yiannis Charalambous
 
 from pathlib import Path
-from typing import Any, Callable, NamedTuple
+from typing import Any, Callable, Iterator, NamedTuple
 from math import prod
 from itertools import product
 import joblib
@@ -108,11 +108,35 @@ class Trials:
             f.name for f in self._checkpoint.checkpoint_dir.iterdir() if f.is_file()
         ]
 
+    def clear_checkpoints(self) -> None:
+        """Deletes all checkpoint files."""
+        for f in self._checkpoint.checkpoint_dir.iterdir():
+            if f.is_file():
+                f.unlink()
+
     def run_dynamic(
         self, counts_fn: Callable[[int], Experiment | None]
     ) -> list[ExperimentResult]:
         """Runs experiments generated dynamically until counts_fn returns None."""
-        results: list[ExperimentResult] = []
+        return list(self.run_dynamic_iter(counts_fn))
+
+    def run(
+        self,
+        counts_matrix: list[tuple[str, int]],
+    ) -> list[ExperimentResult]:
+        """Runs the experiments and returns the results,
+        implemented via the streaming run_iter method.
+
+        Args:
+            counts: list of tuples of param names and count of tests to run for
+                each param."""
+
+        return list(self.run_iter(counts_matrix))
+
+    def run_dynamic_iter(
+        self, counts_fn: Callable[[int], Experiment | None]
+    ) -> Iterator[ExperimentResult]:
+        """Runs experiments generated dynamically until counts_fn returns None."""
         idx = 0
         while True:
             exp: Experiment | None = counts_fn(idx)
@@ -121,38 +145,29 @@ class Trials:
 
             key: str = self._key_gen(exp)
             # Check for existing checkpoint
-            cached: Any = self._checkpoint.check(key)
-            if cached is None:
+            result: Any = self._checkpoint.check(key)
+            if result is None:
                 # Execute experiment and save
-                outcome = self._epoch_fn(exp)
-                self._checkpoint.save(key, outcome)
-            else:
-                outcome = cached
-            results.append(ExperimentResult(experiment=exp, result=outcome))
-            idx += 1
-        return results
+                result = self._epoch_fn(exp)
+                self._checkpoint.save(key, result)
 
-    def run(
+            yield ExperimentResult(experiment=exp, result=result)
+            idx += 1
+
+    def run_iter(
         self,
         counts_matrix: list[tuple[str, int]],
-    ) -> list[ExperimentResult]:
+    ) -> Iterator[ExperimentResult]:
         """Runs the experiments and returns the results.
 
         Args:
             counts: list of tuples of param names and count of tests to run for
                 each param."""
-
-        results: list[ExperimentResult] = []
         # Unzip into two sequences: names and their counts
-        names_tuple, counts_tuple = zip(*counts_matrix)
-        names: list[str] = list(names_tuple)
-        counts: list[int] = list(counts_tuple)
-        del names_tuple, counts_tuple
-
+        names, counts = zip(*counts_matrix)
         max_count: int = prod(counts)
-
         # Make a range(1…count) for each entry
-        ranges: list[range] = [range(0, c) for c in counts]
+        ranges: list[range] = [range(c) for c in counts]
 
         # product(*) will iterate over every possible combination
         # combo is a tuple that contains a configuration of the counts_matrix
@@ -164,7 +179,6 @@ class Trials:
                 max_count=max_count,
             )
             key: str = self._key_gen(exp)
-
             # Checkpoint Check
             result: Any = self._checkpoint.check(key)
             if result is None:
@@ -172,12 +186,4 @@ class Trials:
                 # Checkpoint Save
                 self._checkpoint.save(key, result)
 
-            # Store experiment
-            results.append(ExperimentResult(result=result, experiment=exp))
-        return results
-
-    def clear_checkpoints(self) -> None:
-        """Deletes all checkpoint files."""
-        for f in self._checkpoint.checkpoint_dir.iterdir():
-            if f.is_file():
-                f.unlink()
+            yield ExperimentResult(experiment=exp, result=result)
