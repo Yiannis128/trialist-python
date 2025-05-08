@@ -2,10 +2,12 @@
 #
 # SPDX-License-Identifier: GPLv3
 
-from trialist.experiment import Checkpoint, Experiment, Trials
+from trialist.experiment import Checkpoint, Experiment, Trial
+from trialist.trial_viewer import TrialViewer
 
 __all__ = [
     "Checkpoint",
     "Experiment",
-    "Trials",
+    "Trial",
+    "TrialViewer",
 ]
